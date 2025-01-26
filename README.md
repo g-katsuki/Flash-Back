@@ -19,3 +19,20 @@ CONTAINER ID   IMAGE            COMMAND                  CREATED         STATUS 
 706ef2af9e5c   mariadb:latest   "docker-entrypoint.s…"   3 minutes ago   Up 3 minutes (healthy)   0.0.0.0:3307->3306/tcp   back-db-1
 ```
 
+## DockerHubへのプッシュ
+
+1. DockerHubにログイン
+```
+docker login
+```
+
+2. イメージにタグを付ける
+```
+docker tag back-app:latest gkatsuki22/back-app:latest
+```
+
+3. イメージをプッシュ
+```
+docker push gkatsuki22/back-app:latest
+```
+
