@@ -24,7 +24,8 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./src/main/resources/db/migration:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "mariadb", "-u", "root", "-pQwqwqw12!!??", "-e", "SELECT 1"]
       interval: 5s
@@ -34,4 +35,5 @@ services:
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
 volumes:
-  mariadb_data: 
+  mariadb_data:
+    driver: local 

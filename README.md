@@ -6,7 +6,15 @@
 
 ## 終了
 
-`docker-compose down -v`
+データを保持したまま終了する場合：
+```
+docker-compose down
+```
+
+データを完全に削除する場合：
+```
+docker-compose down -v
+```
 
 ## 確認
 
@@ -21,18 +29,182 @@ CONTAINER ID   IMAGE            COMMAND                  CREATED         STATUS 
 
 ## DockerHubへのプッシュ
 
-1. DockerHubにログイン
+1. アプリケーションのビルド
+```
+./gradlew clean build -x test
+docker-compose build
+```
+
+2. DockerHubにログイン
 ```
 docker login
 ```
 
-2. イメージにタグを付ける
+3. イメージにタグを付ける
 ```
-docker tag back-app:latest gkatsuki22/back-app:latest
+docker tag back-app:latest gkatsuki22/flashcard-app:latest
 ```
 
-3. イメージをプッシュ
+4. イメージをプッシュ
 ```
-docker push gkatsuki22/back-app:latest
+docker push gkatsuki22/flashcard-app:latest
+```
+
+### 他の環境での実行
+
+1. docker-compose.ymlのイメージを変更
+```yaml
+services:
+  app:
+    image: gkatsuki22/flashcard-app:latest
+```
+
+2. コンテナの起動
+```
+docker-compose up -d
+```
+
+## データベース
+
+### マイグレーション
+データベースのスキーマは自動的に作成されます。初期データは`src/main/resources/db/migration`に格納されています。
+
+### バックアップとリストア
+
+#### ローカル環境
+バックアップの作成：
+```
+docker exec back-db-1 mariadb-dump -u root -pQwqwqw12!!?? flashcard_db > backup.sql
+```
+
+#### EC2環境
+1. EC2上でバックアップを作成：
+```
+docker exec back-db-1 mariadb-dump -u root -pQwqwqw12!!?? flashcard_db > ~/backup.sql
+```
+
+2. ローカルPCへバックアップをダウンロード：
+```
+scp -i ~/.ssh/your-key.pem ec2-user@your-ec2-ip:~/backup.sql ./
+```
+
+3. バックアップからリストア（必要な場合）：
+```
+scp -i ~/.ssh/your-key.pem ./backup.sql ec2-user@your-ec2-ip:~/
+cat ~/backup.sql | docker exec -i back-db-1 mariadb -u root -pQwqwqw12!!?? flashcard_db
+```
+
+## EC2環境での実行
+
+### 1. EC2インスタンスのセットアップ
+
+1. EC2インスタンスを起動
+   - Amazon Linux 2023を推奨
+   - セキュリティグループで以下のポートを開放：
+     - 22 (SSH)
+     - 80 (HTTP)
+     - 8080 (アプリケーション)
+
+2. Docker環境のセットアップ
+```bash
+# 必要なパッケージのインストール
+sudo yum update -y
+sudo yum install -y docker git
+
+# Dockerの起動と自動起動設定
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# 現在のユーザーをdockerグループに追加
+sudo usermod -aG docker ec2-user
+# 一度ログアウトして再ログイン
+
+# Docker Composeのインストール
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+# dockerにログイン
+```
+docker login
+```
+
+### 2. アプリケーションのデプロイ
+
+1. 設定ファイルの準備
+```bash
+mkdir flashcard-app
+cd flashcard-app
+
+# docker-compose.ymlの作成
+cat << EOF > docker-compose.yml
+version: '3.8'
+
+services:
+  app:
+    platform: linux/amd64
+    image: gkatsuki22/back-app:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/flashcard_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Qwqwqw12!!??
+    restart: on-failure
+
+  db:
+    platform: linux/amd64
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: Qwqwqw12!!??
+      MYSQL_DATABASE: flashcard_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./src/main/resources/db/migration:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mariadb", "-u", "root", "-pQwqwqw12!!??", "-e", "SELECT 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mariadb_data:
+    driver: local
+EOF
+
+# データディレクトリの作成
+mkdir -p docker/mysql/data
+```
+
+2. アプリケーションの起動
+
+```bash
+docker-compose pull
+
+docker-compose up -d
+```
+
+3. ログの確認
+```bash
+docker-compose logs -f
+```
+
+### 3. 動作確認
+
+1. EC2のパブリックIPアドレスを使用してアクセス
+```
+http://[EC2のパブリックIP]:8080
+```
+
+2. ヘルスチェック
+```bash
+curl http://localhost:8080/health
 ```
 
