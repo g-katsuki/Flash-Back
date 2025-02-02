@@ -102,8 +102,8 @@ cat ~/backup.sql | docker exec -i back-db-1 mariadb -u root -pQwqwqw12!!?? flash
    - Amazon Linux 2023を推奨
    - セキュリティグループで以下のポートを開放：
      - 22 (SSH)
-     - 80 (HTTP)
-     - 8080 (アプリケーション)
+     - 443 (HTTPS)
+     - 3307 (MariaDB - 必要な場合のみ)
 
 2. Docker環境のセットアップ
 ```bash
@@ -142,10 +142,9 @@ version: '3.8'
 
 services:
   app:
-    platform: linux/amd64
     image: gkatsuki22/back-app:latest
     ports:
-      - "8080:8080"
+      - "443:443"  # HTTPSポートに変更
     depends_on:
       db:
         condition: service_healthy
@@ -153,14 +152,21 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/flashcard_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: Qwqwqw12!!??
+      SERVER_SSL_KEY_STORE: /ssl/keystore.jks
+      SERVER_SSL_KEY_STORE_PASSWORD: Qwqwqw12!!??
+      SERVER_SSL_KEY_ALIAS: tomcat
+      SERVER_PORT: 443
+    volumes:
+      - ./ssl:/ssl  # 証明書をマウント
     restart: on-failure
 
   db:
-    platform: linux/amd64
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: Qwqwqw12!!??
       MYSQL_DATABASE: flashcard_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
       - "3307:3306"
     volumes:
@@ -200,11 +206,11 @@ docker-compose logs -f
 
 1. EC2のパブリックIPアドレスを使用してアクセス
 ```
-http://[EC2のパブリックIP]:8080
+https://[EC2のパブリックIP]
 ```
 
 2. ヘルスチェック
 ```bash
-curl http://localhost:8080/health
+curl https://localhost/health
 ```
 

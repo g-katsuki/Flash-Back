@@ -10,7 +10,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/flashcards")
-@CrossOrigin(origins = "*")
+@CrossOrigin(
+    origins = {
+        "http://localhost:3000",
+        "https://flashcard-app-gk.netlify.app"
+    },
+    allowCredentials = "true"  // 追加
+)
 public class FlashcardController {
     
     @Autowired
