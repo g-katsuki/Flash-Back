@@ -1,3 +1,14 @@
+EC2でやること
+```bash
+cd flashcard-app
+
+docker-compose down
+
+docker-compose pull
+
+docker-compose up -d
+```
+
 ## 起動
 
 `./gradlew clean build -x test`
@@ -28,6 +39,12 @@ CONTAINER ID   IMAGE            COMMAND                  CREATED         STATUS 
 ```
 
 ## DockerHubへのプッシュ
+
+0. 簡略コマンド
+```
+./gradlew clean build -x test
+docker buildx build --platform linux/amd64 -t gkatsuki22/back-app:latest --push .
+```
 
 1. アプリケーションのビルド
 ```
@@ -204,14 +221,14 @@ docker-compose logs -f
 
 ### 3. 動作確認
 
-1. EC2のパブリックIPアドレスを使用してアクセス
+ローカル環境：
 ```
-https://[EC2のパブリックIP]
+http://localhost:8080
 ```
 
-2. ヘルスチェック
-```bash
-curl https://localhost/health
+本番環境：
+```
+https://[EC2のパブリックIP]
 ```
 
 ## HTTPS設定

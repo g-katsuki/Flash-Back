@@ -1,10 +1,9 @@
-version: '3.8'
-
 services:
   app:
-    build: .
+    build: .  # ローカル開発用にbuildを使用
     ports:
-      - "443:8080"
+      - "443:443"  # HTTPS用
+      - "8080:8080"  # 開発用
     depends_on:
       db:
         condition: service_healthy
