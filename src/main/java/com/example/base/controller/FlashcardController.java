@@ -61,6 +61,18 @@ public class FlashcardController {
         }
     }
 
+    @GetMapping("/folder/{folderId}/generate-sentence")
+    public ResponseEntity<String> generateSentence(@PathVariable String folderId) {
+        try {
+            String sentence = flashcardService.generateSentenceFromCards(folderId);
+            return ResponseEntity.ok(sentence);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error generating sentence: " + e.getMessage());
+        }
+    }
+
     @PostConstruct
     public void init() {
         System.out.println("FlashcardController initialized with mappings:");

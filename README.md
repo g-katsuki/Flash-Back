@@ -245,3 +245,12 @@ https://[EC2のパブリックIP]
 ### 4. SSL証明書の準備
 1. コマンドで証明書を取得(お名前.comのドメイン管理画面でSSL証明書を取得することもできる？)
 2. 取得したSSL証明書をEC2インスタンスに配置
+
+
+Open Router使用
+# EC2上で環境変数を設定
+echo 'OPENROUTER_API_KEY=[APIキー]' >> ~/.bashrc
+source ~/.bashrc
+
+# docker-compose.ymlで環境変数を参照
+OPENROUTER_API_KEY=${OPENROUTER_API_KEY} docker-compose up -d
