@@ -63,7 +63,7 @@ public class OpenRouterClient {
         message.put("content", prompt);
         
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "deepseek/deepseek-r1:free");  // 使用するモデル
+        requestBody.put("model", "deepseek/deepseek-chat-v3-0324:free");  // 使用するモデル
         requestBody.put("messages", List.of(message));
         
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
@@ -74,6 +74,7 @@ public class OpenRouterClient {
             System.out.println("Headers: " + headers);
             System.out.println("Request body: " + requestBody);
             
+            @SuppressWarnings("unchecked")
             Map<String, Object> response = restTemplate.postForObject(API_URL, request, Map.class);
             System.out.println("=== OPENROUTER API RESPONSE ===");
             System.out.println(response);
@@ -82,12 +83,14 @@ public class OpenRouterClient {
                 throw new RuntimeException("Invalid response from OpenRouter API");
             }
             
+            @SuppressWarnings("unchecked")
             List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
             if (choices.isEmpty()) {
                 throw new RuntimeException("No choices returned from OpenRouter API");
             }
             
             Map<String, Object> firstChoice = choices.get(0);
+            @SuppressWarnings("unchecked")
             Map<String, Object> messageResponse = (Map<String, Object>) firstChoice.get("message");
             return (String) messageResponse.get("content");
         } catch (Exception e) {
