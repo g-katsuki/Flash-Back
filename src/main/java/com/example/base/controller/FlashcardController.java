@@ -25,10 +25,18 @@ public class FlashcardController {
     @Autowired
     private FlashcardService flashcardService;
     
+    // ID指定ができるようになったら不要
     @GetMapping
     public ResponseEntity<List<Flashcard>> getAllFlashcards() {
         System.out.println("=== GET ALL FLASHCARDS REQUEST START ===");
         return ResponseEntity.ok(flashcardService.getAllFlashcards());
+    }
+
+    @GetMapping("/folder/{folderId}")
+    public ResponseEntity<List<Flashcard>> getFlashcardsByFolderId(@PathVariable String folderId) {
+        System.out.println("=== GET FLASHCARDS BY FOLDER ID REQUEST START ===");
+        System.out.println("Folder ID: " + folderId);
+        return ResponseEntity.ok(flashcardService.getFlashcardsByFolderId(folderId));
     }
     
     @PostMapping

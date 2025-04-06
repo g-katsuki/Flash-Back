@@ -22,6 +22,11 @@ public class FlashcardService {
     public List<Flashcard> getAllFlashcards() {
         return flashcardRepository.findAll();
     }
+
+    public List<Flashcard> getFlashcardsByFolderId(String folderId) {
+        System.out.println(folderId);
+        return flashcardRepository.findByFolderId(folderId);
+    }
     
     public Flashcard createFlashcard(Flashcard flashcard) {
         return flashcardRepository.save(flashcard);
