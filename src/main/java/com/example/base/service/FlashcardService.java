@@ -51,7 +51,7 @@ public class FlashcardService {
             .collect(Collectors.toList());
         
         // プロンプトを作成
-        String prompt = "英語の勉強の為にこれらをすべて含む英文を作成して。動詞の活用や複数形など多少変形してもいいです。" + 
+        String prompt = "英語の勉強の為にこれらをすべて含む英文を作成して。動詞の活用や複数形など多少変形してもいいです。説明などは要らず例文を１つだけ出力して。" + 
             String.join(", ", backContents);
         
         // AIに問い合わせ

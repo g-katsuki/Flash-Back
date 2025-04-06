@@ -11,7 +11,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/flashcard_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: Qwqwqw12!!??
-      OPENROUTER_API_KEY: "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"
+      OPENROUTER_API_KEY: "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"
     restart: on-failure
 
   db:

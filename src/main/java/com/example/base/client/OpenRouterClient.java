@@ -63,7 +63,7 @@ public class OpenRouterClient {
         message.put("content", prompt);
         
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "deepseek/deepseek-chat-v3-0324:free");  // 使用するモデル
+        requestBody.put("model", "openai/gpt-4o-mini");  // 使用するモデル
         requestBody.put("messages", List.of(message));
         
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
