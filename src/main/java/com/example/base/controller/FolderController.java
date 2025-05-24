@@ -43,4 +43,13 @@ public class FolderController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Folder> updateFolder(@PathVariable Long id, @RequestBody Folder folder) {
+        try {
+            return ResponseEntity.ok(folderService.updateFolder(id, folder));
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 } 

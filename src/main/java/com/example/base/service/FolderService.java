@@ -27,4 +27,11 @@ public class FolderService {
             .orElseThrow(() -> new ResourceNotFoundException("Folder not found with id: " + id));
         folderRepository.delete(folder);
     }
+
+    public Folder updateFolder(Long id, Folder updatedFolder) {
+        Folder folder = folderRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Folder not found with id: " + id));
+        folder.setName(updatedFolder.getName());
+        return folderRepository.save(folder);
+    }
 } 
